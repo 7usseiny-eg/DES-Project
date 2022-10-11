@@ -85,6 +85,7 @@ void readFile(string filePath, string *fileData)
     newfile.open(filePath.c_str());
     newfile >> *fileData;
 }
+// THIS IS OUR USER INTERFACE WE CAN CHANGE IT EASILY FROM HERE
 void fillParams(void)
 {
     string fileName;
