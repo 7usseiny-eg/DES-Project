@@ -25,6 +25,7 @@ vector<uint8_t>* keyPtr;
 vector<uint8_t> encryptedText;
 vector<uint8_t>* encryptedTextPtr;
 
+
 #define MODULE_TEST 1
 // FOR TEST ONLY
 #if MODULE_TEST
@@ -63,8 +64,8 @@ initialpermutation
 void initialPermutation(char *des_text)
 {
 }
-void expansionETable(char *des_text)
-{
+void expansionETable(char *des_text){
+
 }
 void XOR(char *input1, char *input2, int bit_size)
 {
@@ -78,8 +79,7 @@ void permutation_p(char *des_text)
 void round(char *des_text, char *subkey)
 {
 }
-void readFile(string filePath, vector<uint8_t>** ptr, vector<uint8_t>* data)
-{
+void readFile(string filePath, vector<uint8_t>** ptr, vector<uint8_t>* data){
     // IF THERE WAS A DELIMITER WE WILL BE USING GETLINE TO BUFFER THE STRING OF PLAINTEXT
     //  FOR NOW, THE DELIMITER IS THE SPACE
     FILE* input_file = fopen(filePath.c_str(), "r");
@@ -96,8 +96,7 @@ void readFile(string filePath, vector<uint8_t>** ptr, vector<uint8_t>* data)
     fclose(input_file);
 }
 // THIS IS OUR USER INTERFACE WE CAN CHANGE IT EASILY FROM HERE
-void fillParams(void)
-{
+void fillParams(void){
     string fileName;
     cout << "Please insert the file path of the plain text: " << endl
          << "If you to decrypt, please type \"0\"" << endl;
