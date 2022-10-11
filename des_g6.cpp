@@ -61,27 +61,28 @@ decryput
 round
 initialpermutation
 */
-void initialPermutation(char *des_text)
-{
-}
-void expansionETable(char *des_text){
+vector<uint8_t> initialPermutation(vector<uint8_t> des_text){
 
 }
-void XOR(char *input1, char *input2, int bit_size)
-{
+vector<uint8_t> expansionETable(vector<uint8_t> des_text){
+    
 }
-void sbox(char *des_text)
-{
+vector<uint8_t> XOR(vector<uint8_t> input1, vector<uint8_t> input2, int bit_size){
+
 }
-void permutation_p(char *des_text)
-{
+vector<uint8_t> sbox(vector<uint8_t>des_text){
+
 }
-void round(char *des_text, char *subkey)
-{
+vector<uint8_t> permutation_p(vector<uint8_t> des_text){
+
+}
+vector<uint8_t> round(vector<uint8_t> des_text, vector<uint8_t> subkey){
+
 }
 void readFile(string filePath, vector<uint8_t>** ptr, vector<uint8_t>* data){
     // IF THERE WAS A DELIMITER WE WILL BE USING GETLINE TO BUFFER THE STRING OF PLAINTEXT
     //  FOR NOW, THE DELIMITER IS THE SPACE
+    uint8_t x = 0;
     FILE* input_file = fopen(filePath.c_str(), "r");
     if (input_file == nullptr) {
         cerr << "Could not open the file - '"
@@ -89,6 +90,7 @@ void readFile(string filePath, vector<uint8_t>** ptr, vector<uint8_t>* data){
         return;
     }
     *ptr = data;
+
     while(!feof(input_file)){
         (*data).push_back(getc(input_file));
     }
@@ -117,17 +119,18 @@ void fillParams(void){
         readFile(fileName, &encryptedTextPtr, &encryptedText);
     }
 }
-void DES_Encrypt(char *des_text, char *des_key)
+void DES_Encrypt(vector<uint8_t>* des_text, vector<uint8_t> des_key)
 {
 
 }
 
-void DES_Decrypt(char *des_encrypted_data, char *des_key)
-{
+void DES_Decrypt(vector<uint8_t>* des_encrypted_data, vector<uint8_t> des_key){
 
 }
-
 int main()
 {
     fillParams();
+    for(int i = 0; i < plainText.size(); i++){
+        cout << plainText[i];
+    }
 }
