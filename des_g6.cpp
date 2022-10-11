@@ -17,13 +17,13 @@
 using namespace std;
 /*              GLOBAL          VARIABLES                */
 vector<uint8_t> plainText;
-uint8_t* plainTextPtr;
+vector<uint8_t>* plainTextPtr;
 
 vector<uint8_t> key;
-uint8_t* keyPtr;
+vector<uint8_t>* keyPtr;
 
 vector<uint8_t> encryptedText;
-uint8_t* encryptedTextPtr;
+vector<uint8_t>* encryptedTextPtr;
 
 #define MODULE_TEST 1
 // FOR TEST ONLY
@@ -78,7 +78,7 @@ void permutation_p(char *des_text)
 void round(char *des_text, char *subkey)
 {
 }
-void readFile(string filePath)
+void readFile(string filePath, vector<uint8_t>** ptr, vector<uint8_t>* data)
 {
     // IF THERE WAS A DELIMITER WE WILL BE USING GETLINE TO BUFFER THE STRING OF PLAINTEXT
     //  FOR NOW, THE DELIMITER IS THE SPACE
@@ -88,10 +88,9 @@ void readFile(string filePath)
              << filePath.c_str() << "'" << endl;
         return;
     }
-    uint8_t c;
+    *ptr = data;
     while(!feof(input_file)){
-        c = getc(input_file);
-        cout << c << "-";
+        (*data).push_back(getc(input_file));
     }
     fclose(input_file);
 }
@@ -101,20 +100,21 @@ void fillParams(void)
     string fileName;
     cout << "Please insert the file path of the plain text: " << endl
          << "If you to decrypt, please type \"0\"" << endl;
+
     if (fileName != "0")
     {
         cin >> fileName;
-        readFile(fileName);
+        readFile(fileName, &plainTextPtr, &plainText);
     }
     cout << "Please insert the file path of the key: " << endl;
     cin >> fileName;
-    readFile(fileName);
+    readFile(fileName, &keyPtr, &key);
     cout << "Please insert the file path of the encrypted text: " << endl
          << "If you want to encrypt, please type \"0\"" << endl;
     if (fileName != "0")
     {
         cin >> fileName;
-        readFile(fileName);
+        readFile(fileName, &encryptedTextPtr, &encryptedText);
     }
 }
 void DES_Encrypt(char *des_text, char *des_key)
