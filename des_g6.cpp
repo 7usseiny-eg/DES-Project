@@ -12,21 +12,21 @@
 #include <iostream>
 #include <fstream>
 #include <string.h>
-
+using namespace std;
 /*              GLOBAL          VARIABLES                */
-std::ifstream newfile;
+ifstream newfile;
 
-std::string plainTextPtr;
-std::string plainText;
+string plainTextPtr;
+string plainText;
 
-std::string keyPtr;
-std::string key;
+string keyPtr;
+string key;
 
-std::string encryptedTextPtr;
-std::string encryptedText;
+string encryptedTextPtr;
+string encryptedText;
 
 #define MODULE_TEST 1
-//FOR TEST ONLY
+// FOR TEST ONLY
 #if MODULE_TEST
 
 // plainText = "02468aceeca86420";
@@ -78,27 +78,31 @@ void permutation_p(char *des_text)
 void round(char *des_text, char *subkey)
 {
 }
-void readFile(std::string filePath, std::string* fileData){
-    //IF THERE WAS A DELIMITER WE WILL BE USING GETLINE TO BUFFER THE STRING OF PLAINTEXT
-    // FOR NOW, THE DELIMITER IS THE SPACE
+void readFile(string filePath, string *fileData)
+{
+    // IF THERE WAS A DELIMITER WE WILL BE USING GETLINE TO BUFFER THE STRING OF PLAINTEXT
+    //  FOR NOW, THE DELIMITER IS THE SPACE
     newfile.open(filePath.c_str());
     newfile >> *fileData;
 }
-void fillParams(void){
-    std::string fileName;
-    std::cout << "Please insert the file path of the plain text: " << std::endl << \
-    "If you to decrypt, please type \"0\"" << std::endl;
-    if(fileName != "0"){
-        std::cin >> fileName;
+void fillParams(void)
+{
+    string fileName;
+    cout << "Please insert the file path of the plain text: " << endl
+         << "If you to decrypt, please type \"0\"" << endl;
+    if (fileName != "0")
+    {
+        cin >> fileName;
         readFile(fileName, &plainText);
     }
-    std::cout << "Please insert the file path of the key: " << std::endl;
-    std::cin >> fileName;
+    cout << "Please insert the file path of the key: " << endl;
+    cin >> fileName;
     readFile(fileName, &key);
-    std::cout << "Please insert the file path of the encrypted text: " << std::endl << \
-    "If you want to encrypt, please type \"0\"" << std::endl;
-    if(fileName != "0"){
-        std::cin >> fileName;
+    cout << "Please insert the file path of the encrypted text: " << endl
+         << "If you want to encrypt, please type \"0\"" << endl;
+    if (fileName != "0")
+    {
+        cin >> fileName;
         readFile(fileName, &encryptedText);
     }
 }
