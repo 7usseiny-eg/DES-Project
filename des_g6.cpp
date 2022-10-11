@@ -92,6 +92,7 @@ void readFile(string filePath, vector<uint8_t>** ptr, vector<uint8_t>* data)
     while(!feof(input_file)){
         (*data).push_back(getc(input_file));
     }
+    (*data).pop_back();
     fclose(input_file);
 }
 // THIS IS OUR USER INTERFACE WE CAN CHANGE IT EASILY FROM HERE
