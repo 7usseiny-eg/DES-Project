@@ -48,6 +48,29 @@ const uint8_t const_ip[] = {
     59, 51, 43, 35, 27, 19, 11, 3,
     61, 53, 45, 37, 29, 21, 13, 5,
     63, 55, 47, 39, 31, 23, 15, 7};
+
+int ASCIIHexToInt[] =
+{
+    // ASCII
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, -1, -1, -1, -1, -1, -1,
+    -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+
+    // 0x80-FF (Omit this if you don't need to check for non-ASCII)
+    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+};
 // data related
 /*7osseny:
 encryput
@@ -68,7 +91,10 @@ vector<uint8_t> expansionETable(vector<uint8_t> des_text){
     
 }
 vector<uint8_t> XOR(vector<uint8_t> input1, vector<uint8_t> input2, int bit_size){
+    vector<uint8_t> result;
+    for(int i = 0; i < bit_size; i++){
 
+    }
 }
 vector<uint8_t> sbox(vector<uint8_t>des_text){
 
@@ -82,7 +108,6 @@ vector<uint8_t> round(vector<uint8_t> des_text, vector<uint8_t> subkey){
 void readFile(string filePath, vector<uint8_t>** ptr, vector<uint8_t>* data){
     // IF THERE WAS A DELIMITER WE WILL BE USING GETLINE TO BUFFER THE STRING OF PLAINTEXT
     //  FOR NOW, THE DELIMITER IS THE SPACE
-    uint8_t x = 0;
     FILE* input_file = fopen(filePath.c_str(), "r");
     if (input_file == nullptr) {
         cerr << "Could not open the file - '"
@@ -90,11 +115,20 @@ void readFile(string filePath, vector<uint8_t>** ptr, vector<uint8_t>* data){
         return;
     }
     *ptr = data;
-
+    uint8_t x = 0;
+    uint8_t tempData = 0;
     while(!feof(input_file)){
-        (*data).push_back(getc(input_file));
+        if(x == 0){
+            tempData += (ASCIIHexToInt[getc(input_file)] * 16);
+            x++;
+        }
+        else{
+            tempData += ASCIIHexToInt[getc(input_file)];
+            (*data).push_back(tempData);
+            x = 0;
+            tempData = 0;
+        }
     }
-    (*data).pop_back();
     fclose(input_file);
 }
 // THIS IS OUR USER INTERFACE WE CAN CHANGE IT EASILY FROM HERE
@@ -108,6 +142,9 @@ void fillParams(void){
         cin >> fileName;
         readFile(fileName, &plainTextPtr, &plainText);
     }
+    for(int i = 0; i < plainText.size(); i++){
+        cout << plainText[i];
+    }
     cout << "Please insert the file path of the key: " << endl;
     cin >> fileName;
     readFile(fileName, &keyPtr, &key);
@@ -119,8 +156,7 @@ void fillParams(void){
         readFile(fileName, &encryptedTextPtr, &encryptedText);
     }
 }
-void DES_Encrypt(vector<uint8_t>* des_text, vector<uint8_t> des_key)
-{
+void DES_Encrypt(vector<uint8_t>* des_text, vector<uint8_t> des_key){
 
 }
 
@@ -130,7 +166,4 @@ void DES_Decrypt(vector<uint8_t>* des_encrypted_data, vector<uint8_t> des_key){
 int main()
 {
     fillParams();
-    for(int i = 0; i < plainText.size(); i++){
-        cout << plainText[i];
-    }
 }
