@@ -12,18 +12,18 @@
 #include <iostream>
 #include <fstream>
 #include <string.h>
+#include <vector>
+
 using namespace std;
 /*              GLOBAL          VARIABLES                */
-ifstream newfile;
+vector<uint8_t> plainText;
+uint8_t* plainTextPtr;
 
-string plainTextPtr;
-string plainText;
+vector<uint8_t> key;
+uint8_t* keyPtr;
 
-string keyPtr;
-string key;
-
-string encryptedTextPtr;
-string encryptedText;
+vector<uint8_t> encryptedText;
+uint8_t* encryptedTextPtr;
 
 #define MODULE_TEST 1
 // FOR TEST ONLY
@@ -50,8 +50,8 @@ const uint8_t const_ip[] = {
 // data related
 /*7osseny:
 encryput
-read
-expansion
+read DONE
+expansion ON IT
 xor
 */
 /*mo3ta
@@ -78,12 +78,22 @@ void permutation_p(char *des_text)
 void round(char *des_text, char *subkey)
 {
 }
-void readFile(string filePath, string *fileData)
+void readFile(string filePath)
 {
     // IF THERE WAS A DELIMITER WE WILL BE USING GETLINE TO BUFFER THE STRING OF PLAINTEXT
     //  FOR NOW, THE DELIMITER IS THE SPACE
-    newfile.open(filePath.c_str());
-    newfile >> *fileData;
+    FILE* input_file = fopen(filePath.c_str(), "r");
+    if (input_file == nullptr) {
+        cerr << "Could not open the file - '"
+             << filePath.c_str() << "'" << endl;
+        return;
+    }
+    uint8_t c;
+    while((c = fgetc(input_file)) != EOF){
+        putchar(c);
+        cout << "-";
+    }
+    fclose(input_file);
 }
 // THIS IS OUR USER INTERFACE WE CAN CHANGE IT EASILY FROM HERE
 void fillParams(void)
@@ -94,25 +104,27 @@ void fillParams(void)
     if (fileName != "0")
     {
         cin >> fileName;
-        readFile(fileName, &plainText);
+        readFile(fileName);
     }
     cout << "Please insert the file path of the key: " << endl;
     cin >> fileName;
-    readFile(fileName, &key);
+    readFile(fileName);
     cout << "Please insert the file path of the encrypted text: " << endl
          << "If you want to encrypt, please type \"0\"" << endl;
     if (fileName != "0")
     {
         cin >> fileName;
-        readFile(fileName, &encryptedText);
+        readFile(fileName);
     }
 }
 void DES_Encrypt(char *des_text, char *des_key)
 {
+
 }
 
 void DES_Decrypt(char *des_encrypted_data, char *des_key)
 {
+
 }
 
 int main()
