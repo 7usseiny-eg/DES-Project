@@ -89,9 +89,9 @@ void readFile(string filePath)
         return;
     }
     uint8_t c;
-    while((c = fgetc(input_file)) != EOF){
-        putchar(c);
-        cout << "-";
+    while(!feof(input_file)){
+        c = getc(input_file);
+        cout << c << "-";
     }
     fclose(input_file);
 }
