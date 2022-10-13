@@ -16,15 +16,14 @@
 
 using namespace std;
 /*              GLOBAL          VARIABLES                */
-vector<uint8_t> plainText;
-vector<uint8_t>* plainTextPtr;
+uint16_t plainText;
+uint16_t plainTextPtr;
 
-vector<uint8_t> key;
-vector<uint8_t>* keyPtr;
+uint16_t key;
+uint16_t keyPtr;
 
-vector<uint8_t> encryptedText;
-vector<uint8_t>* encryptedTextPtr;
-
+uint16_t encryptedText;
+uint16_t encryptedTextPtr;
 
 #define MODULE_TEST 1
 // FOR TEST ONLY
@@ -50,27 +49,26 @@ const uint8_t const_ip[] = {
     63, 55, 47, 39, 31, 23, 15, 7};
 
 int ASCIIHexToInt[] =
-{
-    // ASCII
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, -1, -1, -1, -1, -1, -1,
-    -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    {
+        // ASCII
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1, -1,
+        -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 
-    // 0x80-FF (Omit this if you don't need to check for non-ASCII)
-    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-};
+        // 0x80-FF (Omit this if you don't need to check for non-ASCII)
+        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2};
 // data related
 /*7osseny:
 encryput
@@ -84,26 +82,27 @@ decryput
 round
 initialpermutation
 */
-vector<uint8_t> initialPermutation(vector<uint8_t> des_text){
-
+uint16_t initialPermutation(uint16_t des_text)
+{
 }
-vector<uint8_t> expansionETable(vector<uint8_t> des_text){
-    
+uint16_t expansionETable(uint16_t des_text)
+{
 }
-vector<uint8_t> XOR(vector<uint8_t> input1, vector<uint8_t> input2, int bit_size){
-    vector<uint8_t> result;
-    for(int i = 0; i < bit_size; i++){
-
+uint16_t XOR(uint16_t input1, uint16_t input2, int bit_size)
+{
+    uint16_t result;
+    for (int i = 0; i < bit_size; i++)
+    {
     }
 }
-vector<uint8_t> sbox(vector<uint8_t>des_text){
-
+uint16_t sbox(uint16_t des_text)
+{
 }
-vector<uint8_t> permutation_p(vector<uint8_t> des_text){
-
+uint16_t permutation_p(uint16_t des_text)
+{
 }
-vector<uint8_t> round(vector<uint8_t> des_text, vector<uint8_t> subkey){
-
+uint16_t round(uint16_t des_text, uint16_t subkey)
+{
 }
 // uint64_t read64FromFile(string filePath, unsigned int shift){
 //     // IF THERE WAS A DELIMITER WE WILL BE USING GETLINE TO BUFFER THE STRING OF PLAINTEXT
@@ -157,36 +156,39 @@ vector<uint8_t> round(vector<uint8_t> des_text, vector<uint8_t> subkey){
 //         read64FromFile(fileName, &encryptedTextPtr, &encryptedText);
 //     }
 // }
-uint64_t DES_Encrypt_Block(uint64_t des_text, uint64_t des_key){
+uint64_t DES_Encrypt_Block(uint64_t des_text, uint64_t des_key)
+{
     uint64_t result = 0;
 
     return result;
 }
 void DES_Encrypt(uint64_t des_key, string filePath)
 {
-    FILE* input_file = fopen(filePath.c_str(), "r");
+    FILE *input_file = fopen(filePath.c_str(), "r");
     int x = 0;
     uint64_t currBlock = 0;
     char currChar;
     uint64_t currEncBlock = 0;
-    while(!feof(input_file)){
-        while(x < 16){
+    while (!feof(input_file))
+    {
+        while (x < 16)
+        {
             currChar = getc(input_file);
-            if(currChar == -1){
+            if (currChar == -1)
+            {
                 fclose(input_file);
                 return;
             }
             currBlock |= ASCIIHexToInt[currChar];
-            if(x != 15)
+            if (x != 15)
                 currBlock = currBlock << 4;
             x++;
         }
-        
     }
 }
 
-void DES_Decrypt(vector<uint8_t>* des_encrypted_data, vector<uint8_t> des_key){
-
+void DES_Decrypt(vector<uint8_t> *des_encrypted_data, vector<uint8_t> des_key)
+{
 }
 int main()
 {
