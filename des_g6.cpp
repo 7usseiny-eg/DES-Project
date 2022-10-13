@@ -113,7 +113,23 @@ uint64_t initialPermutation(uint64_t block)
     return result;
 }
 uint64_t expansionETable(uint64_t block){
-
+    uint64_t result = 0;
+    uint32_t count = 0;
+    const uint8_t table[] =
+    {
+        32, 1, 2, 3, 4, 5,
+        4 , 5, 6, 7, 8, 9,
+        8 , 9, 10, 11, 12, 13,
+        12, 13, 14, 15, 16, 17,
+        16, 17, 18, 19, 20, 21,
+        20, 21, 22, 23, 24, 25,
+        24, 25, 26, 27, 28, 29,
+        28, 29, 30, 31, 32, 1};
+    for(int i = 0; i <= 48; i++){
+        result |= (checkBit(block, table[count] - 1) << i);
+        count++;
+    }
+    return result;
 }
 uint64_t XOR(uint64_t input1, uint64_t input2){
 
@@ -396,11 +412,12 @@ void DES_Encrypt(uint64_t des_key, string filePath)
                 currBlock = currBlock << 4;
             x++;
         }
+        //CODE GOES HERE
     }
 }
 
-void DES_Decrypt(vector<uint8_t> *des_encrypted_data, vector<uint8_t> des_key)
-{
+void DES_Decrypt(vector<uint8_t> *des_encrypted_data, vector<uint8_t> des_key){
+
 }
 int main()
 {
@@ -408,5 +425,8 @@ int main()
     // cout << initialPermutation(0x123456789ABCDEF) << endl;
     // cout << std::hex << sbox(0x6117BA866527) << endl;
     // cout << std::hex << inverse_permutation(0xA4CD99543423234);
+    // uint64_t x = 0b01111111111111111111111111111111;
+    // cout << x << endl;
+    // cout << expansionETable(x) << endl;
     cout << std::hex << round(0xCC00CCFFF0AAF0AA, 0x1B02EFFC7072);
 }
