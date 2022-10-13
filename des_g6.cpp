@@ -27,9 +27,9 @@ uint16_t keyPtr;
 uint16_t encryptedText;
 uint16_t encryptedTextPtr;
 
-typedef unsigned char         uint8;          /*           0 .. 255              */
-typedef unsigned long         uint32;         /*           0 .. 4294967295       */
-typedef unsigned long long    uint64;         /*       0 .. 18446744073709551615  */
+typedef unsigned char uint8;       /*           0 .. 255              */
+typedef unsigned long uint32;      /*           0 .. 4294967295       */
+typedef unsigned long long uint64; /*       0 .. 18446744073709551615  */
 
 #define BLOCK_SIZE 64U
 
@@ -82,7 +82,7 @@ int ASCIIHexToInt[] =
         -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2};
 // data related
 /*7osseny:
-encryput 
+encryput
 read DONE
 expansion DONE
 xor DONE
@@ -112,28 +112,30 @@ uint64_t initialPermutation(uint64_t block)
     }
     return result;
 }
-uint64_t expansionETable(uint64_t block){
+uint64_t expansionETable(uint64_t block)
+{
     uint64_t result = 0;
     uint32_t count = 0;
     const uint8_t table[] =
+        {
+            32, 1, 2, 3, 4, 5,
+            4, 5, 6, 7, 8, 9,
+            8, 9, 10, 11, 12, 13,
+            12, 13, 14, 15, 16, 17,
+            16, 17, 18, 19, 20, 21,
+            20, 21, 22, 23, 24, 25,
+            24, 25, 26, 27, 28, 29,
+            28, 29, 30, 31, 32, 1};
+    for (int i = 0; i <= 48; i++)
     {
-        32, 1, 2, 3, 4, 5,
-        4 , 5, 6, 7, 8, 9,
-        8 , 9, 10, 11, 12, 13,
-        12, 13, 14, 15, 16, 17,
-        16, 17, 18, 19, 20, 21,
-        20, 21, 22, 23, 24, 25,
-        24, 25, 26, 27, 28, 29,
-        28, 29, 30, 31, 32, 1};
-    for(int i = 0; i <= 48; i++){
         result |= (checkBit(block, table[count] - 1) << i);
         count++;
     }
     return result;
 }
-uint64_t XOR(uint64_t input1, uint64_t input2){
+uint64_t XOR(uint64_t input1, uint64_t input2)
+{
     return (input1 ^ input2);
-
 }
 uint64_t sbox(uint64_t block_48)
 {
@@ -225,6 +227,21 @@ uint64_t inverse_permutation(uint64_t block)
 }
 uint64_t permutation_p(uint64_t block)
 {
+    const uint8_t table[]{
+        16, 7, 20, 21,
+        29, 12, 28, 17,
+        1, 15, 23, 26,
+        5, 18, 31, 10,
+        2, 8, 24, 14,
+        32, 27, 3, 9,
+        19, 13, 30, 6,
+        22, 11, 4, 25};
+    uint64_t result = 0;
+    for (int i = 0; i < 32; i++)
+    {
+        result = (result << 1) | (checkBit(block, 32 - table[i]));
+    }
+    return result;
 }
 uint64_t round(uint64_t block, uint64_t subkey)
 {
@@ -291,18 +308,17 @@ uint64_t round(uint64_t block, uint64_t subkey)
 //     }
 // }
 
-
-
-uint64_t hex_to_deximal_64(string hexText){
+uint64_t hex_to_deximal_64(string hexText)
+{
     uint64_t result = 0;
-    for(int i = 0; i < hexText.size(); i++){
+    for (int i = 0; i < hexText.size(); i++)
+    {
         result |= ASCIIHexToInt[hexText[i]];
-        if(i != hexText.size() - 1)
+        if (i != hexText.size() - 1)
             result = result << 4;
     }
     return result;
 }
-
 
 /*
  * Description :
@@ -335,13 +351,13 @@ uint64 permutation(uint64 binary_input, uint64 permutation[], uint8 original_siz
 uint64 permuted_choice_1(uint64 general_64_bit_key)
 {
     uint64 choice_1_permutation[56] = {57, 49, 41, 33, 25, 17, 9,
-                                    1, 58, 50, 42, 34, 26, 18,
-                                    10, 2, 59, 51, 43, 35, 27,
-                                    19, 11, 3, 60, 52, 44, 36,
-                                    63, 55, 47, 39, 31, 23, 15,
-                                    7, 62, 54, 46, 38, 30, 22,
-                                    14, 6, 61, 53, 45, 37, 29,
-                                    21, 13, 5, 28, 20, 12, 4};
+                                       1, 58, 50, 42, 34, 26, 18,
+                                       10, 2, 59, 51, 43, 35, 27,
+                                       19, 11, 3, 60, 52, 44, 36,
+                                       63, 55, 47, 39, 31, 23, 15,
+                                       7, 62, 54, 46, 38, 30, 22,
+                                       14, 6, 61, 53, 45, 37, 29,
+                                       21, 13, 5, 28, 20, 12, 4};
 
     return permutation(general_64_bit_key, choice_1_permutation, 64, 56);
 }
@@ -353,38 +369,38 @@ uint64 permuted_choice_1(uint64 general_64_bit_key)
 uint64 permuted_choice_2(uint64 general_64_bit_key)
 {
     uint64 choice_2_permutation[48] = {14, 17, 11, 24, 1, 5,
-                                    3, 28, 15, 6, 21, 10,
-                                    23, 19, 12, 4, 26, 8,
-                                    16, 7, 27, 20, 13, 2,
-                                    41, 52, 31, 37, 47, 55,
-                                    30, 40, 51, 45, 33, 48,
-                                    44, 49, 39, 56, 34, 53,
-                                    46, 42, 50, 36, 29, 32};
+                                       3, 28, 15, 6, 21, 10,
+                                       23, 19, 12, 4, 26, 8,
+                                       16, 7, 27, 20, 13, 2,
+                                       41, 52, 31, 37, 47, 55,
+                                       30, 40, 51, 45, 33, 48,
+                                       44, 49, 39, 56, 34, 53,
+                                       46, 42, 50, 36, 29, 32};
 
     return permutation(general_64_bit_key, choice_2_permutation, 56, 48);
 }
 
 /*
-* Description :
-* generate key for all 16 round according to des standard.
-*/
+ * Description :
+ * generate key for all 16 round according to des standard.
+ */
 void generate_key(string key, uint64 *final_generated_key)
 {
-   int shift_values[16] = {1, 1, 2, 2,
-                          2, 2, 2, 2,
-                          1, 2, 2, 2,
-                          2, 2, 2, 1};
-   uint64 general_64_bit_key =hex_to_deximal_64(key);
-   uint64 effective_56_bit_key = permuted_choice_1(general_64_bit_key);
-   uint64 effective_key_28_bit_left = (effective_56_bit_key >> 28) & 0x0FFFFFFF;
-   uint64 effective_key_28_bit_right = effective_56_bit_key & 0x0FFFFFFF;
-   for (int i = 0; i < 16; i++)
-   {
-       effective_key_28_bit_left = left_circular_shift_28_bits(effective_key_28_bit_left, shift_values[i]);
-       effective_key_28_bit_right = left_circular_shift_28_bits(effective_key_28_bit_right, shift_values[i]);
-       uint64 effective_48_bit_key = permuted_choice_2((effective_key_28_bit_left << 28) | effective_key_28_bit_right);
-       final_generated_key[i] = effective_48_bit_key;
-   }
+    int shift_values[16] = {1, 1, 2, 2,
+                            2, 2, 2, 2,
+                            1, 2, 2, 2,
+                            2, 2, 2, 1};
+    uint64 general_64_bit_key = hex_to_deximal_64(key);
+    uint64 effective_56_bit_key = permuted_choice_1(general_64_bit_key);
+    uint64 effective_key_28_bit_left = (effective_56_bit_key >> 28) & 0x0FFFFFFF;
+    uint64 effective_key_28_bit_right = effective_56_bit_key & 0x0FFFFFFF;
+    for (int i = 0; i < 16; i++)
+    {
+        effective_key_28_bit_left = left_circular_shift_28_bits(effective_key_28_bit_left, shift_values[i]);
+        effective_key_28_bit_right = left_circular_shift_28_bits(effective_key_28_bit_right, shift_values[i]);
+        uint64 effective_48_bit_key = permuted_choice_2((effective_key_28_bit_left << 28) | effective_key_28_bit_right);
+        final_generated_key[i] = effective_48_bit_key;
+    }
 }
 uint64_t DES_Encrypt_Block(uint64_t des_text, uint64_t des_key)
 {
@@ -416,10 +432,11 @@ void DES_Encrypt(string des_key, string filePath)
         }
         currEncBlock = currBlock;
         x = 0;
-        //CODE GOES HERE
-        while(x < 16){
+        // CODE GOES HERE
+        while (x < 16)
+        {
             currEncBlock = round(currEncBlock, final_generated_key[x]);
-            cout << "Round " << x << " " << std::hex << currEncBlock << endl; 
+            cout << "Round " << x << " " << std::hex << currEncBlock << endl;
             x++;
         }
         x = 0;
@@ -427,8 +444,8 @@ void DES_Encrypt(string des_key, string filePath)
     }
 }
 
-void DES_Decrypt(vector<uint8_t> *des_encrypted_data, vector<uint8_t> des_key){
-
+void DES_Decrypt(vector<uint8_t> *des_encrypted_data, vector<uint8_t> des_key)
+{
 }
 int main()
 {
@@ -440,5 +457,5 @@ int main()
     // cout << x << endl;
     // cout << expansionETable(x) << endl;
     // cout << std::hex << round(0xCC00CCFFF0AAF0AA, 0x1B02EFFC7072);
-    DES_Encrypt("0f1571c947d9e859", "input.hex");
+    // DES_Encrypt("0f1571c947d9e859", "input.hex");
 }
