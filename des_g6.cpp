@@ -82,10 +82,10 @@ int ASCIIHexToInt[] =
         -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2};
 // data related
 /*7osseny:
-encryput
+encryput 
 read DONE
-expansion ON IT
-xor
+expansion DONE
+xor DONE
 */
 /*mo3ta
 sbox                (done)
@@ -132,6 +132,7 @@ uint64_t expansionETable(uint64_t block){
     return result;
 }
 uint64_t XOR(uint64_t input1, uint64_t input2){
+    return (input1 ^ input2);
 
 }
 uint64_t sbox(uint64_t block_48)
@@ -390,13 +391,14 @@ uint64_t DES_Encrypt_Block(uint64_t des_text, uint64_t des_key)
     uint64_t result = 0;
     return result;
 }
-void DES_Encrypt(uint64_t des_key, string filePath)
+void DES_Encrypt(string des_key, string filePath)
 {
     FILE *input_file = fopen(filePath.c_str(), "r");
     int x = 0;
     uint64_t currBlock = 0;
     char currChar;
     uint64_t currEncBlock = 0;
+    generate_key(des_key, final_generated_key);
     while (!feof(input_file))
     {
         while (x < 16)
@@ -412,7 +414,12 @@ void DES_Encrypt(uint64_t des_key, string filePath)
                 currBlock = currBlock << 4;
             x++;
         }
+        x = 0;
         //CODE GOES HERE
+        while(x < 16){
+            cout << round(currBlock, final_generated_key[x]);
+            x++;
+        }
     }
 }
 
@@ -428,5 +435,6 @@ int main()
     // uint64_t x = 0b01111111111111111111111111111111;
     // cout << x << endl;
     // cout << expansionETable(x) << endl;
-    cout << std::hex << round(0xCC00CCFFF0AAF0AA, 0x1B02EFFC7072);
+    // cout << std::hex << round(0xCC00CCFFF0AAF0AA, 0x1B02EFFC7072);
+    DES_Encrypt("asdsdasd", "input.hex");
 }
