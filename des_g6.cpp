@@ -386,6 +386,18 @@ void generate_key(string key, uint64 *final_generated_key)
        final_generated_key[i] = effective_48_bit_key;
    }
 }
+uint64_t DES_Encrypt_Block(uint64_t des_text, uint64_t* final_generated_key)
+{
+    int x = 0;
+    uint64_t resEncBlock = des_text;
+    while(x < 16){
+        resEncBlock = round(resEncBlock, final_generated_key[x]);
+        cout << "Round " << x << " " << std::hex << resEncBlock << endl; 
+        x++;
+    }
+    x = 0;
+    return resEncBlock;
+}
 void DES_Encrypt(string des_key, string filePath)
 {
     FILE *input_file = fopen(filePath.c_str(), "r");
@@ -409,14 +421,8 @@ void DES_Encrypt(string des_key, string filePath)
                 currBlock = currBlock << 4;
             x++;
         }
-        currEncBlock = currBlock;
-        x = 0;
-        //CODE GOES HERE
-        while(x < 16){
-            currEncBlock = round(currEncBlock, final_generated_key[x]);
-            cout << "Round " << x << " " << std::hex << currEncBlock << endl; 
-            x++;
-        }
+        currEncBlock = DES_Encrypt_Block(currBlock, final_generated_key);
+        cout << "Final Encrypted Text " << currEncBlock << endl;
         x = 0;
         currBlock = 0;
     }
