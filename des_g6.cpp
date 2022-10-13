@@ -28,8 +28,6 @@ uint16_t encryptedTextPtr;
 #define BLOCK_SIZE 64U
 
 /*      masks      */
-#define UPPER32(x) x >> 32
-#define LOWER32(x) x &(0x0000FFFF)
 #define checkBit(data, x) ((data >> x) & (1))
 
 #define MODULE_TEST 1
