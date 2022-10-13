@@ -420,19 +420,18 @@ uint64_t DES_Encrypt_Block(uint64_t des_text, uint64_t *final_generated_key)
 uint64_t DES_Decrypt_Block(uint64_t des_text, uint64_t *final_generated_key)
 {
     int x = 15;
-    uint64_t resEncBlock = des_text;
-    resEncBlock = inverse_permutation(resEncBlock);
-    resEncBlock = (resEncBlock << 32) | (resEncBlock >> 32 & 0xFFFFFFFF);
+    uint64_t resDecBlock = des_text;
+    resDecBlock = initialPermutation(resDecBlock);
 
     while (x >= 0)
     {
-        resEncBlock = round(resEncBlock, final_generated_key[x]);
-        cout << "Round " << x << " " << std::hex << resEncBlock << endl;
+        resDecBlock = round(resDecBlock, final_generated_key[x]);
+        cout << "Round " << x << " " << std::hex << resDecBlock << endl;
         x--;
     }
-
-    resEncBlock = initialPermutation(resEncBlock);
-    return resEncBlock;
+    resDecBlock = (resDecBlock << 32) | (resDecBlock >> 32 & 0xFFFFFFFF);
+    resDecBlock = inverse_permutation(resDecBlock);
+    return resDecBlock;
 }
 void DES_Encrypt(string des_key, string filePath)
 {
@@ -464,8 +463,34 @@ void DES_Encrypt(string des_key, string filePath)
     }
 }
 
-void DES_Decrypt(vector<uint8_t> *des_encrypted_data, vector<uint8_t> des_key)
+void DES_Decrypt(string des_key, string filePath)
 {
+    FILE *input_file = fopen(filePath.c_str(), "r");
+    int x = 0;
+    uint64_t currBlock = 0;
+    char currChar;
+    uint64_t currEncBlock = 0;
+    generate_key(des_key, final_generated_key);
+    while (!feof(input_file))
+    {
+        while (x < 16)
+        {
+            currChar = getc(input_file);
+            if (currChar == -1)
+            {
+                fclose(input_file);
+                return;
+            }
+            currBlock |= ASCIIHexToInt[currChar];
+            if (x != 15)
+                currBlock = currBlock << 4;
+            x++;
+        }
+        currEncBlock = DES_Decrypt_Block(currBlock, final_generated_key);
+        cout << "Final Encrypted Text " << currEncBlock << endl;
+        x = 0;
+        currBlock = 0;
+    }
 }
 int main()
 {
@@ -477,7 +502,7 @@ int main()
     // cout << x << endl;
     // cout << expansionETable(x) << endl;
     // cout << std::hex << round(0xCC00CCFFF0AAF0AA, 0x1B02EFFC7072);
-    DES_Encrypt("0f1571c947d9e859", "input.hex");
-    generate_key("0f1571c947d9e859", final_generated_key);
-    cout << std::hex << DES_Decrypt_Block(0xda02ce3a89ecac3b, final_generated_key);
+    // DES_Encrypt("0f1571c947d9e859", "input.hex");
+    // generate_key("0f1571c947d9e859", final_generated_key);
+    // cout << std::hex << DES_Decrypt_Block(0xda02ce3a89ecac3b, final_generated_key);
 }
