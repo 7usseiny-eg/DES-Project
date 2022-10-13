@@ -414,12 +414,16 @@ void DES_Encrypt(string des_key, string filePath)
                 currBlock = currBlock << 4;
             x++;
         }
+        currEncBlock = currBlock;
         x = 0;
         //CODE GOES HERE
         while(x < 16){
-            cout << round(currBlock, final_generated_key[x]);
+            currEncBlock = round(currEncBlock, final_generated_key[x]);
+            cout << "Round " << x << " " << std::hex << currEncBlock << endl; 
             x++;
         }
+        x = 0;
+        currBlock = 0;
     }
 }
 
@@ -436,5 +440,5 @@ int main()
     // cout << x << endl;
     // cout << expansionETable(x) << endl;
     // cout << std::hex << round(0xCC00CCFFF0AAF0AA, 0x1B02EFFC7072);
-    DES_Encrypt("asdsdasd", "input.hex");
+    DES_Encrypt("0f1571c947d9e859", "input.hex");
 }

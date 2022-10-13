@@ -7,6 +7,8 @@
         "atomic": "cpp",
         "xutility": "cpp",
         "cmath": "cpp",
-        "ios": "cpp"
+        "ios": "cpp",
+        "xiosbase": "cpp",
+        "ostream": "cpp"
     }
 }
