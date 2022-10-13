@@ -16,6 +16,8 @@
 
 using namespace std;
 /*              GLOBAL          VARIABLES                */
+uint64_t final_generated_key[16] = {0};
+
 uint16_t plainText;
 uint16_t plainTextPtr;
 
@@ -24,6 +26,10 @@ uint16_t keyPtr;
 
 uint16_t encryptedText;
 uint16_t encryptedTextPtr;
+
+typedef unsigned char         uint8;          /*           0 .. 255              */
+typedef unsigned long         uint32;         /*           0 .. 4294967295       */
+typedef unsigned long long    uint64;         /*       0 .. 18446744073709551615  */
 
 #define BLOCK_SIZE 64U
 
@@ -106,11 +112,11 @@ uint64_t initialPermutation(uint64_t block)
     }
     return result;
 }
-uint64_t expansionETable(uint64_t block)
-{
+uint64_t expansionETable(uint64_t block){
+
 }
-uint64_t XOR(uint64_t input1, uint64_t input2)
-{
+uint64_t XOR(uint64_t input1, uint64_t input2){
+
 }
 uint64_t sbox(uint64_t block_48)
 {
@@ -267,6 +273,102 @@ uint64_t round(uint64_t block, uint64_t subkey)
 //         read64FromFile(fileName, &encryptedTextPtr, &encryptedText);
 //     }
 // }
+
+
+
+uint64_t hex_to_deximal_64(string hexText){
+    uint64_t result = 0;
+    for(int i = 0; i < hexText.size(); i++){
+        result |= ASCIIHexToInt[hexText[i]];
+        if(i != hexText.size() - 1)
+            result = result << 4;
+    }
+    return result;
+}
+
+
+/*
+ * Description :
+ * shift left the key value with specific number of shifts
+ */
+inline uint32 left_circular_shift_28_bits(uint32 effective_28_bit_key, uint8 no_of_shifts)
+{
+    return ((effective_28_bit_key << no_of_shifts) | (effective_28_bit_key >> (28 - no_of_shifts))) & 0x0fffffff;
+}
+
+/*
+ * Description :
+ * arrange bits according to permutaion table and resize it.
+ */
+
+uint64 permutation(uint64 binary_input, uint64 permutation[], uint8 original_size, uint8 needed_size)
+{
+    uint64 permutated_binary = 0;
+    for (int i = 0; i < needed_size; i++)
+    {
+        permutated_binary |= (binary_input >> (original_size - permutation[i]) & 1) << needed_size - (i + 1);
+    }
+    return permutated_binary;
+}
+
+/*
+ * Description :
+ * generate 56 bit key after permutation for first time.
+ */
+uint64 permuted_choice_1(uint64 general_64_bit_key)
+{
+    uint64 choice_1_permutation[56] = {57, 49, 41, 33, 25, 17, 9,
+                                    1, 58, 50, 42, 34, 26, 18,
+                                    10, 2, 59, 51, 43, 35, 27,
+                                    19, 11, 3, 60, 52, 44, 36,
+                                    63, 55, 47, 39, 31, 23, 15,
+                                    7, 62, 54, 46, 38, 30, 22,
+                                    14, 6, 61, 53, 45, 37, 29,
+                                    21, 13, 5, 28, 20, 12, 4};
+
+    return permutation(general_64_bit_key, choice_1_permutation, 64, 56);
+}
+
+/*
+ * Description :
+ * Generate 48 bit key after permutation for second time.
+ */
+uint64 permuted_choice_2(uint64 general_64_bit_key)
+{
+    uint64 choice_2_permutation[48] = {14, 17, 11, 24, 1, 5,
+                                    3, 28, 15, 6, 21, 10,
+                                    23, 19, 12, 4, 26, 8,
+                                    16, 7, 27, 20, 13, 2,
+                                    41, 52, 31, 37, 47, 55,
+                                    30, 40, 51, 45, 33, 48,
+                                    44, 49, 39, 56, 34, 53,
+                                    46, 42, 50, 36, 29, 32};
+
+    return permutation(general_64_bit_key, choice_2_permutation, 56, 48);
+}
+
+/*
+* Description :
+* generate key for all 16 round according to des standard.
+*/
+void generate_key(string key, uint64 *final_generated_key)
+{
+   int shift_values[16] = {1, 1, 2, 2,
+                          2, 2, 2, 2,
+                          1, 2, 2, 2,
+                          2, 2, 2, 1};
+   uint64 general_64_bit_key =hex_to_deximal_64(key);
+   uint64 effective_56_bit_key = permuted_choice_1(general_64_bit_key);
+   uint64 effective_key_28_bit_left = (effective_56_bit_key >> 28) & 0x0FFFFFFF;
+   uint64 effective_key_28_bit_right = effective_56_bit_key & 0x0FFFFFFF;
+   for (int i = 0; i < 16; i++)
+   {
+       effective_key_28_bit_left = left_circular_shift_28_bits(effective_key_28_bit_left, shift_values[i]);
+       effective_key_28_bit_right = left_circular_shift_28_bits(effective_key_28_bit_right, shift_values[i]);
+       uint64 effective_48_bit_key = permuted_choice_2((effective_key_28_bit_left << 28) | effective_key_28_bit_right);
+       final_generated_key[i] = effective_48_bit_key;
+   }
+}
 uint64_t DES_Encrypt_Block(uint64_t des_text, uint64_t des_key)
 {
     uint64_t result = 0;
