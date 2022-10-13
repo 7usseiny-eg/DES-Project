@@ -25,6 +25,10 @@ uint16_t keyPtr;
 uint16_t encryptedText;
 uint16_t encryptedTextPtr;
 
+/*      masks      */
+#define UPPER32(x) x >> 32
+#define LOWER32(x) x && (0x0000FFFF)
+
 #define MODULE_TEST 1
 // FOR TEST ONLY
 #if MODULE_TEST
@@ -82,26 +86,26 @@ decryput
 round
 initialpermutation
 */
-uint16_t initialPermutation(uint16_t des_text)
+uint64_t initialPermutation(uint64_t des_text)
 {
 }
-uint16_t expansionETable(uint16_t des_text)
+uint64_t expansionETable(uint64_t des_text)
 {
 }
-uint16_t XOR(uint16_t input1, uint16_t input2, int bit_size)
+uint64_t XOR(uint64_t input1, uint64_t input2, int bit_size)
 {
-    uint16_t result;
+    uint64_t result;
     for (int i = 0; i < bit_size; i++)
     {
     }
 }
-uint16_t sbox(uint16_t des_text)
+uint64_t sbox(uint64_t des_text)
 {
 }
-uint16_t permutation_p(uint16_t des_text)
+uint64_t permutation_p(uint64_t des_text)
 {
 }
-uint16_t round(uint16_t des_text, uint16_t subkey)
+uint64_t round(uint64_t des_text, uint64_t subkey)
 {
 }
 // uint64_t read64FromFile(string filePath, unsigned int shift){
@@ -159,7 +163,6 @@ uint16_t round(uint16_t des_text, uint16_t subkey)
 uint64_t DES_Encrypt_Block(uint64_t des_text, uint64_t des_key)
 {
     uint64_t result = 0;
-
     return result;
 }
 void DES_Encrypt(uint64_t des_key, string filePath)
