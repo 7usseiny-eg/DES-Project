@@ -105,59 +105,84 @@ vector<uint8_t> permutation_p(vector<uint8_t> des_text){
 vector<uint8_t> round(vector<uint8_t> des_text, vector<uint8_t> subkey){
 
 }
-void readFile(string filePath, vector<uint8_t>** ptr, vector<uint8_t>* data){
-    // IF THERE WAS A DELIMITER WE WILL BE USING GETLINE TO BUFFER THE STRING OF PLAINTEXT
-    //  FOR NOW, THE DELIMITER IS THE SPACE
+// uint64_t read64FromFile(string filePath, unsigned int shift){
+//     // IF THERE WAS A DELIMITER WE WILL BE USING GETLINE TO BUFFER THE STRING OF PLAINTEXT
+//     //  FOR NOW, THE DELIMITER IS THE SPACE
+//     FILE* input_file = fopen(filePath.c_str(), "r");
+//     uint64_t result = 0;
+//     uint64_t tempData = 0;
+//     if (input_file == nullptr) {
+//         cerr << "Could not open the file - '"
+//              << filePath.c_str() << "'" << endl;
+//         return -1;
+//     }
+//     int x = 0;
+//     while(!feof(input_file)){
+//         while(x != (shift*16)){
+//             x++;
+//             getc(input_file);
+//         }
+//         x = 0;
+//         while(x < 15){
+//             result += ASCIIHexToInt[getc(input_file)];
+//             result = result << 4;
+//             x++;
+//         }
+//         return result;
+//     }
+//     fclose(input_file);
+// }
+// THIS IS OUR USER INTERFACE WE CAN CHANGE IT EASILY FROM HERE
+// void fillParams(void){
+//     string fileName;
+//     cout << "Please insert the file path of the plain text: " << endl
+//          << "If you to decrypt, please type \"0\"" << endl;
+
+//     if (fileName != "0")
+//     {
+//         cin >> fileName;
+//         read64FromFile(fileName, &plainTextPtr, &plainText);
+//     }
+//     for(int i = 0; i < plainText.size(); i++){
+//         cout << plainText[i];
+//     }
+//     cout << "Please insert the file path of the key: " << endl;
+//     cin >> fileName;
+//     read64FromFile(fileName, &keyPtr, &key);
+//     cout << "Please insert the file path of the encrypted text: " << endl
+//          << "If you want to encrypt, please type \"0\"" << endl;
+//     if (fileName != "0")
+//     {
+//         cin >> fileName;
+//         read64FromFile(fileName, &encryptedTextPtr, &encryptedText);
+//     }
+// }
+uint64_t DES_Encrypt_Block(uint64_t des_text, uint64_t des_key){
+    uint64_t result = 0;
+
+    return result;
+}
+void DES_Encrypt(uint64_t des_key, string filePath)
+{
     FILE* input_file = fopen(filePath.c_str(), "r");
-    if (input_file == nullptr) {
-        cerr << "Could not open the file - '"
-             << filePath.c_str() << "'" << endl;
-        return;
-    }
-    *ptr = data;
-    uint8_t x = 0;
-    uint8_t tempData = 0;
+    int x = 0;
+    uint64_t currBlock = 0;
+    char currChar;
+    uint64_t currEncBlock = 0;
     while(!feof(input_file)){
-        if(x == 0){
-            tempData += (ASCIIHexToInt[getc(input_file)] * 16);
+        while(x < 16){
+            currChar = getc(input_file);
+            if(currChar == -1){
+                fclose(input_file);
+                return;
+            }
+            currBlock |= ASCIIHexToInt[currChar];
+            if(x != 15)
+                currBlock = currBlock << 4;
             x++;
         }
-        else{
-            tempData += ASCIIHexToInt[getc(input_file)];
-            (*data).push_back(tempData);
-            x = 0;
-            tempData = 0;
-        }
+        
     }
-    fclose(input_file);
-}
-// THIS IS OUR USER INTERFACE WE CAN CHANGE IT EASILY FROM HERE
-void fillParams(void){
-    string fileName;
-    cout << "Please insert the file path of the plain text: " << endl
-         << "If you to decrypt, please type \"0\"" << endl;
-
-    if (fileName != "0")
-    {
-        cin >> fileName;
-        readFile(fileName, &plainTextPtr, &plainText);
-    }
-    for(int i = 0; i < plainText.size(); i++){
-        cout << plainText[i];
-    }
-    cout << "Please insert the file path of the key: " << endl;
-    cin >> fileName;
-    readFile(fileName, &keyPtr, &key);
-    cout << "Please insert the file path of the encrypted text: " << endl
-         << "If you want to encrypt, please type \"0\"" << endl;
-    if (fileName != "0")
-    {
-        cin >> fileName;
-        readFile(fileName, &encryptedTextPtr, &encryptedText);
-    }
-}
-void DES_Encrypt(vector<uint8_t>* des_text, vector<uint8_t> des_key){
-
 }
 
 void DES_Decrypt(vector<uint8_t>* des_encrypted_data, vector<uint8_t> des_key){
@@ -165,5 +190,5 @@ void DES_Decrypt(vector<uint8_t>* des_encrypted_data, vector<uint8_t> des_key){
 }
 int main()
 {
-    fillParams();
+    DES_Encrypt(324234234234, "input.hex");
 }
