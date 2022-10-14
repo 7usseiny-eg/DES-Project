@@ -8,7 +8,7 @@
  * Author: Group 6
  *
  **********************************************/
-
+#include <iomanip>
 #include <iostream>
 #include <fstream>
 #include <string.h>
@@ -410,7 +410,7 @@ uint64_t DES_Encrypt_Block(uint64_t des_text, uint64_t *final_generated_key)
     while (x < 16)
     {
         resEncBlock = round(resEncBlock, final_generated_key[x]);
-        cout << "Round " << x << " " << std::hex << resEncBlock << endl;
+        // cout << "Round " << x << " " << std::hex << resEncBlock << endl;
         x++;
     }
     resEncBlock = (resEncBlock << 32) | (resEncBlock >> 32 & 0xFFFFFFFF);
@@ -426,7 +426,7 @@ uint64_t DES_Decrypt_Block(uint64_t des_text, uint64_t *final_generated_key)
     while (x >= 0)
     {
         resDecBlock = round(resDecBlock, final_generated_key[x]);
-        cout << "Round " << x << " " << std::hex << resDecBlock << endl;
+        // cout << "Round " << x << " " << std::hex << resDecBlock << endl;
         x--;
     }
     resDecBlock = (resDecBlock << 32) | (resDecBlock >> 32 & 0xFFFFFFFF);
@@ -457,7 +457,7 @@ void DES_Encrypt(string des_key, string filePath)
             x++;
         }
         currEncBlock = DES_Encrypt_Block(currBlock, final_generated_key);
-        cout << "Final Encrypted Text " << currEncBlock << endl;
+        cout << setw(16) << setfill('0') << std::hex << currEncBlock;
         x = 0;
         currBlock = 0;
     }
@@ -487,7 +487,7 @@ void DES_Decrypt(string des_key, string filePath)
             x++;
         }
         currEncBlock = DES_Decrypt_Block(currBlock, final_generated_key);
-        cout << "Final Encrypted Text " << currEncBlock << endl;
+        cout << setw(16) << setfill('0') << std::hex << currEncBlock;
         x = 0;
         currBlock = 0;
     }
@@ -505,4 +505,5 @@ int main()
     // DES_Encrypt("0f1571c947d9e859", "input.hex");
     // generate_key("0f1571c947d9e859", final_generated_key);
     // cout << std::hex << DES_Decrypt_Block(0xda02ce3a89ecac3b, final_generated_key);
+    DES_Decrypt("0f1571c947d9e859", "encoded_msg.hex");
 }
