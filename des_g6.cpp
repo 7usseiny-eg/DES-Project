@@ -13,6 +13,7 @@
 #include <fstream>
 #include <string.h>
 #include <vector>
+#include <assert.h>
 
 using namespace std;
 /*              GLOBAL          VARIABLES                */
@@ -433,13 +434,19 @@ uint64_t DES_Decrypt_Block(uint64_t des_text, uint64_t *final_generated_key)
     resDecBlock = inverse_permutation(resDecBlock);
     return resDecBlock;
 }
-void DES_Encrypt(string des_key, string filePath)
+void DES_Encrypt(string des_key, string fileInputPath, string fileOutputPath)
 {
-    FILE *input_file = fopen(filePath.c_str(), "r");
+    FILE *input_file = fopen(fileInputPath.c_str(), "r");
     int x = 0;
     uint64_t currBlock = 0;
     char currChar;
-    uint64_t currEncBlock = 0;
+    uint64_t currDecBlock = 0;
+    ofstream outdata;
+    outdata.open(fileOutputPath);
+    if (!outdata)
+    {
+        assert("couldn't open folder");
+    }
     generate_key(des_key, final_generated_key);
     while (!feof(input_file))
     {
@@ -456,20 +463,27 @@ void DES_Encrypt(string des_key, string filePath)
                 currBlock = currBlock << 4;
             x++;
         }
-        currEncBlock = DES_Encrypt_Block(currBlock, final_generated_key);
-        cout << setw(16) << setfill('0') << std::hex << currEncBlock;
+        currDecBlock = DES_Encrypt_Block(currBlock, final_generated_key);
+        outdata << setw(16) << setfill('0') << std::uppercase << std::hex << currDecBlock;
         x = 0;
         currBlock = 0;
     }
+    outdata.close();
 }
 
-void DES_Decrypt(string des_key, string filePath)
+void DES_Decrypt(string des_key, string fileInputPath, string fileOutputPath)
 {
-    FILE *input_file = fopen(filePath.c_str(), "r");
+    FILE *input_file = fopen(fileInputPath.c_str(), "r");
     int x = 0;
     uint64_t currBlock = 0;
     char currChar;
     uint64_t currEncBlock = 0;
+    ofstream outdata;
+    outdata.open(fileOutputPath);
+    if (!outdata)
+    {
+        assert("couldn't open folder");
+    }
     generate_key(des_key, final_generated_key);
     while (!feof(input_file))
     {
@@ -487,23 +501,17 @@ void DES_Decrypt(string des_key, string filePath)
             x++;
         }
         currEncBlock = DES_Decrypt_Block(currBlock, final_generated_key);
-        cout << setw(16) << setfill('0') << std::hex << currEncBlock;
+        outdata << setw(16) << setfill('0') << std::uppercase << std::hex << currEncBlock;
         x = 0;
         currBlock = 0;
     }
+    outdata.close();
 }
 int main()
 {
-    // DES_Encrypt(324234234234, "input.hex");
-    // cout << initialPermutation(0x123456789ABCDEF) << endl;
-    // cout << std::hex << sbox(0x6117BA866527) << endl;
-    // cout << std::hex << inverse_permutation(0xA4CD99543423234);
-    // uint64_t x = 0b01111111111111111111111111111111;
-    // cout << x << endl;
-    // cout << expansionETable(x) << endl;
-    // cout << std::hex << round(0xCC00CCFFF0AAF0AA, 0x1B02EFFC7072);
-    // DES_Encrypt("0f1571c947d9e859", "input.hex");
-    // generate_key("0f1571c947d9e859", final_generated_key);
-    // cout << std::hex << DES_Decrypt_Block(0xda02ce3a89ecac3b, final_generated_key);
-    DES_Decrypt("0f1571c947d9e859", "encoded_msg.hex");
+
+    string key = "0123456789ABCDEF";
+    DES_Encrypt(key, "plain_text.hex", "encrypted_output.hex");
+    DES_Decrypt(key, "encrypted_input.hex", "plain_text_output.hex");
+    cout << "done" << endl;
 }
