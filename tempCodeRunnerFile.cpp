@@ -1,1 +1,1 @@
-FILE
+, ios::in | ios::binary

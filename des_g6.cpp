@@ -11,22 +11,18 @@
 #include <iomanip>
 #include <iostream>
 #include <fstream>
-#include <string.h>
-#include <vector>
 #include <assert.h>
+#include <sstream>
+#include <string>
+typedef union
+{
+    char bytes[8];
+    uint64_t block;
+} UnionBlock;
 
 using namespace std;
 /*              GLOBAL          VARIABLES                */
 uint64_t final_generated_key[16] = {0};
-
-uint16_t plainText;
-uint16_t plainTextPtr;
-
-uint16_t key;
-uint16_t keyPtr;
-
-uint16_t encryptedText;
-uint16_t encryptedTextPtr;
 
 typedef unsigned char uint8;       /*           0 .. 255              */
 typedef unsigned long uint32;      /*           0 .. 4294967295       */
@@ -436,97 +432,107 @@ uint64_t DES_Decrypt_Block(uint64_t des_text, uint64_t *final_generated_key)
 }
 void DES_Encrypt(string des_key, string fileInputPath, string fileOutputPathHex, string fileOutputPathTxt)
 {
-    FILE *input_file = fopen(fileInputPath.c_str(), "r");
-    int x = 0;
-    uint64_t currBlock = 0;
-    char currChar;
-    uint64_t currDecBlock = 0;
+    // opening files
     ofstream outdatahex;
     ofstream outdatatxt;
     outdatahex.open(fileOutputPathHex);
-    outdatatxt.open(fileOutputPathTxt);
-    if (!outdatahex | !outdatatxt)
+    outdatatxt.open(fileOutputPathTxt, ios::out | ios::binary);
+    ifstream input_file;
+    input_file.open(fileInputPath, ios::in | ios::binary);
+    if (!outdatahex | !outdatatxt | !input_file)
     {
         assert("couldn't open folder");
     }
+
+    // declaring variables
+    uint64_t currBlock = 0;
+    char currChar;
+    uint8_t counter = 0;
+    UnionBlock encrypted_block;
+
     generate_key(des_key, final_generated_key);
-    while (!feof(input_file))
+
+    while (input_file.read(&currChar, 1))
     {
-        while (x < 8)
+        currBlock = (currBlock << 8) | (0xff & currChar);
+        cout << std::hex << (int)currChar << endl;
+        counter++;
+        if (counter == 8)
         {
-            currChar = getc(input_file);
-            if (currChar == -1)
+            encrypted_block.block = DES_Encrypt_Block(currBlock, final_generated_key);
+            outdatahex << setw(16) << setfill('0') << std::uppercase << std::hex << encrypted_block.block;
+            for (int i = 7; i >= 0; i--)
             {
-                fclose(input_file);
-                outdatahex.close();
-                outdatatxt.close();
-                return;
+                outdatatxt << encrypted_block.bytes[i];
             }
-            // currBlock |= ASCIIHexToInt[currChar];
-            currBlock |= currChar;
-            if (x != 7)
-                currBlock = currBlock << 8;
-            x++;
+            counter = 0;
         }
-        currDecBlock = DES_Encrypt_Block(currBlock, final_generated_key);
-        outdatahex << setw(16) << setfill('0') << std::uppercase << std::hex << currDecBlock;
-        for (int i = 7; i >= 0; i--)
-        {
-            outdatatxt << (char)(currDecBlock >> (i * 8));
-        }
-        x = 0;
-        currBlock = 0;
     }
+    input_file.close();
+    outdatahex.close();
+    outdatatxt.close();
 }
 
 void DES_Decrypt(string des_key, string fileInputPath, string fileOutputPathHex, string fileOutputPathTxt)
 {
-    FILE *input_file = fopen(fileInputPath.c_str(), "r");
-    int x = 0;
-    uint64_t currBlock = 0;
-    char currChar;
-    uint64_t currEncBlock = 0;
+    // opening files
     ofstream outdatahex;
     ofstream outdatatxt;
     outdatahex.open(fileOutputPathHex);
-    outdatatxt.open(fileOutputPathTxt);
-    if (!outdatahex | !outdatatxt)
+    outdatatxt.open(fileOutputPathTxt, ios::out | ios::binary);
+    ifstream input_file;
+    input_file.open(fileInputPath, ios::in | ios::binary);
+    if (!outdatahex | !outdatatxt | !input_file)
     {
         assert("couldn't open folder");
     }
+
+    // declaring variables
+    uint64_t currBlock = 0;
+    char currChar;
+    uint8_t counter = 0;
+    UnionBlock decrypted_block;
+
     generate_key(des_key, final_generated_key);
-    while (!feof(input_file))
+
+    while (input_file.read(&currChar, 1))
     {
-        while (x < 8)
+        currBlock = (currBlock << 8) | (0xff & currChar);
+        counter++;
+        if (counter == 8)
         {
-            currChar = getc(input_file);
-            if (currChar == -1)
+            decrypted_block.block = DES_Decrypt_Block(currBlock, final_generated_key);
+            outdatahex << setw(16) << setfill('0') << std::uppercase << std::hex << decrypted_block.block;
+            for (int i = 7; i >= 0; i--)
             {
-                fclose(input_file);
-                outdatahex.close();
-                outdatatxt.close();
-                return;
+                outdatatxt.write(decrypted_block.bytes + i, 1);
             }
-            currBlock |= ASCIIHexToInt[currChar];
-            if (x != 7)
-                currBlock = currBlock << 8;
-            x++;
+            counter = 0;
         }
-        currEncBlock = DES_Decrypt_Block(currBlock, final_generated_key);
-        outdatahex << setw(16) << setfill('0') << std::uppercase << std::hex << currEncBlock;
-        for (int i = 7; i >= 0; i--)
-        {
-            outdatatxt << (char)(currEncBlock >> (i * 8));
-        }
-        x = 0;
-        currBlock = 0;
     }
+    input_file.close();
+    outdatahex.close();
+    outdatatxt.close();
 }
 int main()
 {
+    // getting key
+    ifstream key_file("key.txt"); // taking file as inputstream
+    string key = "";
+    if (key_file)
+    {
+        ostringstream ss;
+        ss << key_file.rdbuf(); // reading data
+        key = ss.str();
+    }
+    if (key.size() != 16)
+    {
+        cout << "wrong key size" << endl;
+    }
 
-    string key = "0123456789ABCDEF";
+    // encryption and decryption
     // DES_Encrypt(key, "plain.txt", "encrypted_output.hex", "encrypted_output.txt");
     DES_Decrypt(key, "encrypted_output.txt", "decrypt.hex", "decrypt.txt");
+
     cout << "done" << endl;
 }
