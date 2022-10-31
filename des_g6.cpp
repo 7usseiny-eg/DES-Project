@@ -430,16 +430,14 @@ uint64_t DES_Decrypt_Block(uint64_t des_text, uint64_t *final_generated_key)
     resDecBlock = inverse_permutation(resDecBlock);
     return resDecBlock;
 }
-void DES_Encrypt(string des_key, string fileInputPath, string fileOutputPathHex, string fileOutputPathTxt)
+void DES_Encrypt(string des_key, string fileInputPath, string fileOutputPathTxt)
 {
     // opening files
-    ofstream outdatahex;
     ofstream outdatatxt;
-    outdatahex.open(fileOutputPathHex);
     outdatatxt.open(fileOutputPathTxt, ios::out | ios::binary);
     ifstream input_file;
     input_file.open(fileInputPath, ios::in | ios::binary);
-    if (!outdatahex | !outdatatxt | !input_file)
+    if (!outdatatxt | !input_file)
     {
         assert("couldn't open folder");
     }
@@ -455,12 +453,11 @@ void DES_Encrypt(string des_key, string fileInputPath, string fileOutputPathHex,
     while (input_file.read(&currChar, 1))
     {
         currBlock = (currBlock << 8) | (0xff & currChar);
-        cout << std::hex << (int)currChar << endl;
+        // cout << std::hex << (int)currChar << endl;
         counter++;
         if (counter == 8)
         {
             encrypted_block.block = DES_Encrypt_Block(currBlock, final_generated_key);
-            outdatahex << setw(16) << setfill('0') << std::uppercase << std::hex << encrypted_block.block;
             for (int i = 7; i >= 0; i--)
             {
                 outdatatxt << encrypted_block.bytes[i];
@@ -469,20 +466,17 @@ void DES_Encrypt(string des_key, string fileInputPath, string fileOutputPathHex,
         }
     }
     input_file.close();
-    outdatahex.close();
     outdatatxt.close();
 }
 
-void DES_Decrypt(string des_key, string fileInputPath, string fileOutputPathHex, string fileOutputPathTxt)
+void DES_Decrypt(string des_key, string fileInputPath, string fileOutputPathTxt)
 {
     // opening files
-    ofstream outdatahex;
     ofstream outdatatxt;
-    outdatahex.open(fileOutputPathHex);
     outdatatxt.open(fileOutputPathTxt, ios::out | ios::binary);
     ifstream input_file;
     input_file.open(fileInputPath, ios::in | ios::binary);
-    if (!outdatahex | !outdatatxt | !input_file)
+    if (!outdatatxt | !input_file)
     {
         assert("couldn't open folder");
     }
@@ -502,7 +496,6 @@ void DES_Decrypt(string des_key, string fileInputPath, string fileOutputPathHex,
         if (counter == 8)
         {
             decrypted_block.block = DES_Decrypt_Block(currBlock, final_generated_key);
-            outdatahex << setw(16) << setfill('0') << std::uppercase << std::hex << decrypted_block.block;
             for (int i = 7; i >= 0; i--)
             {
                 outdatatxt.write(decrypted_block.bytes + i, 1);
@@ -511,13 +504,21 @@ void DES_Decrypt(string des_key, string fileInputPath, string fileOutputPathHex,
         }
     }
     input_file.close();
-    outdatahex.close();
     outdatatxt.close();
 }
-int main()
+
+#define ENCRYPTION "encrypt"
+#define DECRYPTION "decrypt"
+
+int main(int argc, char **argv)
 {
+    string operation_type = argv[1];
+    string input_file_name = argv[2];
+    string key_file_name = argv[3];
+    string output_file_name = argv[4];
+
     // getting key
-    ifstream key_file("key.txt"); // taking file as inputstream
+    ifstream key_file(key_file_name); // taking file as inputstream
     string key = "";
     if (key_file)
     {
@@ -531,8 +532,19 @@ int main()
     }
 
     // encryption and decryption
-    // DES_Encrypt(key, "plain.txt", "encrypted_output.hex", "encrypted_output.txt");
-    DES_Decrypt(key, "encrypted_output.txt", "decrypt.hex", "decrypt.txt");
+    if (operation_type == ENCRYPTION)
+    {
+        cout << "encrypting..." << endl;
+        DES_Encrypt(key, input_file_name, output_file_name);
+    }
+    else if (operation_type == DECRYPTION)
+    {
+        cout << "decrypting..." << endl;
+        DES_Decrypt(key, input_file_name, output_file_name);
+    }
+    else
+        cout << "wrong operation type";
 
     cout << "done" << endl;
+    return 1;
 }
